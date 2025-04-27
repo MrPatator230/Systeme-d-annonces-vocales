@@ -1,6 +1,6 @@
 # Système d'annonces vocales SNCF
 
-Système de génération d'annonces sonores SNCF avec la voix de E-Mone. Cette application permet de gérer une banque de sons, créer des annonces personnalisées et gérer une liste d'annonces.
+Système de génération d'annonces sonores SNCF. Cette application permet de gérer une banque de sons, créer des annonces personnalisées et gérer une liste d'annonces. Cette application vous permettra de concaténer les morceaux d'annonces que vous avez préparés afin d'en faire des annonces.
 
 ## Fonctionnalités
 
@@ -80,15 +80,3 @@ systeme-annonces-vocales/
 - Tailwind CSS
 - FFmpeg pour le traitement audio
 - DND Kit pour le drag & drop
-
-## Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/amazing-feature`)
-3. Commit les changements (`git commit -m 'Add amazing feature'`)
-4. Push la branche (`git push origin feature/amazing-feature`)
-5. Ouvrir une Pull Request
-
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
