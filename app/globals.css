@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sncf-blue: #00005B;
+  --sncf-red: #E40019;
+}
+
+@layer base {
+  body {
+    @apply text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .text-sncf-blue {
+    color: var(--sncf-blue);
+  }
+
+  .text-sncf-red {
+    color: var(--sncf-red);
+  }
+
+  .bg-sncf-blue {
+    background-color: var(--sncf-blue);
+  }
+
+  .bg-sncf-red {
+    background-color: var(--sncf-red);
+  }
+
+  .border-sncf-blue {
+    border-color: var(--sncf-blue);
+  }
+
+  .border-sncf-red {
+    border-color: var(--sncf-red);
+  }
+}
+
+/* Animation for audio progress */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Drag and drop styles */
+[data-dragging="true"] {
+  cursor: grabbing !important;
+}
+
+.sortable-item {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Audio player animations */
+.audio-progress {
+  animation: progress linear forwards;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Transitions */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-colors {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
