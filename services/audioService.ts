@@ -19,6 +19,22 @@ export async function getAudioFiles(): Promise<{ files: AudioFile[], folders: Fo
   }
 }
 
+export async function getAudioFilesForConception(): Promise<AudioFile[]> {
+  try {
+    const response = await fetch('/api/audio/list')
+    const data = await response.json()
+    
+    if (!data.success) {
+      throw new Error(data.error)
+    }
+
+    return data.files
+  } catch (error) {
+    console.error('Error fetching audio files:', error)
+    throw error
+  }
+}
+
 export async function uploadAudioFile(file: File, path: string) {
   try {
     const formData = new FormData()

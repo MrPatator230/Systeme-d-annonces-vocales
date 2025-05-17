@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import SortableItem from '@/components/SortableItem'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import { useAudio } from '@/contexts/AudioContext'
-import { getAudioFiles, concatenateAudioFiles } from '@/services/audioService'
+import { getAudioFilesForConception, concatenateAudioFiles } from '@/services/audioService'
 import { AUDIO_CONFIG, type AudioFile, type AudioCategory } from '@/config/audio'
 
 export default function ConceptionAnnoncePage() {
@@ -27,7 +27,7 @@ export default function ConceptionAnnoncePage() {
   const loadAudioFiles = async () => {
     setIsLoading(true)
     try {
-      const files = await getAudioFiles()
+      const files = await getAudioFilesForConception()
       // Ensure the category is of type AudioCategory
       const typedFiles: AudioFile[] = files.map(file => ({
         ...file,
