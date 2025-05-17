@@ -1,11 +1,133 @@
 {
-  "categories": [
-    "Non classé",
-    "Annonces",
-    "Stations",
-    "Horaires",
-    "Messages",
-    "Effets sonores"
-  ],
-  "files": {}
+  "folders": {},
+  "files": {
+    "/Test/01 - Mobigo.mp3": {
+      "name": "01 - Mobigo.mp3",
+      "createdAt": "2025-05-17T20:01:56.469Z"
+    },
+    "/Test/02 - A destination .mp3": {
+      "name": "02 - A destination .mp3",
+      "createdAt": "2025-05-17T20:01:56.518Z"
+    },
+    "/Test/03 - Il desservira ... .mp3": {
+      "name": "03 - Il desservira ... .mp3",
+      "createdAt": "2025-05-17T20:01:56.550Z"
+    },
+    "/Test/00 - Bienvenue à bord du train ...mp3": {
+      "name": "00 - Bienvenue à bord du train ...mp3",
+      "createdAt": "2025-05-17T20:01:56.578Z"
+    },
+    "/Annonce Perma/02 - A destination .mp3": {
+      "name": "02 - A destination .mp3",
+      "createdAt": "2025-05-17T20:04:02.371Z"
+    },
+    "/Annonce Perma/03 - Il desservira ... .mp3": {
+      "name": "03 - Il desservira ... .mp3",
+      "createdAt": "2025-05-17T20:04:02.407Z"
+    },
+    "/Annonce Perma/00 - Bienvenue à bord du train ...mp3": {
+      "name": "00 - Bienvenue à bord du train ...mp3",
+      "createdAt": "2025-05-17T20:04:02.442Z"
+    },
+    "/Annonce Perma/01 - Mobigo.mp3": {
+      "name": "01 - Mobigo.mp3",
+      "createdAt": "2025-05-17T20:04:02.476Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/MELUN.mp3": {
+      "name": "MELUN.mp3",
+      "createdAt": "2025-05-17T20:14:54.752Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/MONETAU GURGY.mp3": {
+      "name": "MONETAU GURGY.mp3",
+      "createdAt": "2025-05-17T20:14:54.780Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/MONTEREAU.mp3": {
+      "name": "MONTEREAU.mp3",
+      "createdAt": "2025-05-17T20:14:54.807Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/MORET -VENEUX-LES-SABLONS.mp3": {
+      "name": "MORET -VENEUX-LES-SABLONS.mp3",
+      "createdAt": "2025-05-17T20:14:54.834Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/PARIS Bercy.mp3": {
+      "name": "PARIS Bercy.mp3",
+      "createdAt": "2025-05-17T20:14:54.861Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/PONT SUR YONNE.mp3": {
+      "name": "PONT SUR YONNE.mp3",
+      "createdAt": "2025-05-17T20:14:54.888Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/SAINT JULIEN DU SAULT.mp3": {
+      "name": "SAINT JULIEN DU SAULT.mp3",
+      "createdAt": "2025-05-17T20:14:54.917Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/SENS.mp3": {
+      "name": "SENS.mp3",
+      "createdAt": "2025-05-17T20:14:54.947Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/ST-MAMMES.mp3": {
+      "name": "ST-MAMMES.mp3",
+      "createdAt": "2025-05-17T20:14:54.972Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/VILLENEUVE LA GUYARD.mp3": {
+      "name": "VILLENEUVE LA GUYARD.mp3",
+      "createdAt": "2025-05-17T20:14:55.001Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/VILLENEUVE SUR YONNE.mp3": {
+      "name": "VILLENEUVE SUR YONNE.mp3",
+      "createdAt": "2025-05-17T20:14:55.031Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/BOIS LE ROI.mp3": {
+      "name": "BOIS LE ROI.mp3",
+      "createdAt": "2025-05-17T20:14:55.058Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/CHAMPAGNE SUR SEINE.mp3": {
+      "name": "CHAMPAGNE SUR SEINE.mp3",
+      "createdAt": "2025-05-17T20:14:55.085Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/CHAMPIGNY SUR YONNE.mp3": {
+      "name": "CHAMPIGNY SUR YONNE.mp3",
+      "createdAt": "2025-05-17T20:14:55.112Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/CHEMILLY - APOIGNY.mp3": {
+      "name": "CHEMILLY - APOIGNY.mp3",
+      "createdAt": "2025-05-17T20:14:55.144Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/ETIGNY-VERON.mp3": {
+      "name": "ETIGNY-VERON.mp3",
+      "createdAt": "2025-05-17T20:14:55.175Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/FONTAINEBLEAU - AVON.mp3": {
+      "name": "FONTAINEBLEAU - AVON.mp3",
+      "createdAt": "2025-05-17T20:14:55.208Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/JOIGNY.mp3": {
+      "name": "JOIGNY.mp3",
+      "createdAt": "2025-05-17T20:14:55.235Z"
+    },
+    "/Liste des arrêts par lignes/TER --  PARIS - LAROCHE - AUXERRE/LAROCHE MIGENNES.mp3": {
+      "name": "LAROCHE MIGENNES.mp3",
+      "createdAt": "2025-05-17T20:14:55.264Z"
+    },
+    "/Liste des Destinations/PARIS Bercy.mp3": {
+      "name": "PARIS Bercy.mp3",
+      "createdAt": "2025-05-17T20:15:40.195Z"
+    },
+    "/Liste des Destinations/PARIS Gare de Lyon.mp3": {
+      "name": "PARIS Gare de Lyon.mp3",
+      "createdAt": "2025-05-17T20:15:40.231Z"
+    },
+    "/Liste des Destinations/SENS.mp3": {
+      "name": "SENS.mp3",
+      "createdAt": "2025-05-17T20:15:40.268Z"
+    },
+    "/Liste des Destinations/AUXERRE Saint-Gervais.mp3": {
+      "name": "AUXERRE Saint-Gervais.mp3",
+      "createdAt": "2025-05-17T20:15:40.327Z"
+    },
+    "/Liste des Destinations/LAROCHE - MIGENNES.mp3": {
+      "name": "LAROCHE - MIGENNES.mp3",
+      "createdAt": "2025-05-17T20:15:40.374Z"
+    }
+  }
 }

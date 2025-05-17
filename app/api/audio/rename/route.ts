@@ -1,80 +1,44 @@
 import { NextResponse } from 'next/server'
-import { rename, readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
-import { ERROR_MESSAGES, type AudioMetadata } from '@/config/audio'
+import { rename } from 'fs/promises'
+import { join, dirname } from 'path'
+import { readMetadata, writeMetadata, sanitizeFilename } from '@/utils/audioUtils'
 
 export async function PUT(request: Request) {
   try {
-    const { oldName, newName } = await request.json()
-
-    if (!oldName || !newName) {
-      return NextResponse.json(
-        { error: ERROR_MESSAGES.RENAME.INVALID_NAME },
-        { status: 400 }
-      )
-    }
-
-    // Validate new filename
-    if (!/^[a-zA-Z0-9-_ ]+\.(mp3|wav)$/i.test(newName)) {
-      return NextResponse.json(
-        { error: ERROR_MESSAGES.RENAME.INVALID_NAME },
-        { status: 400 }
-      )
-    }
-
+    const { oldPath, newName } = await request.json()
+    
+    // Sanitize new name
+    const sanitizedNewName = sanitizeFilename(newName)
+    
+    // Create the full paths
     const audioDir = join(process.cwd(), 'public', 'audio')
-    const oldPath = join(audioDir, oldName)
-    const newPath = join(audioDir, newName)
-    const metadataPath = join(audioDir, 'metadata.json')
+    const oldFilePath = join(audioDir, oldPath.replace('/audio', ''))
+    const newFilePath = join(dirname(oldFilePath), sanitizedNewName)
+    
+    const relativeOldPath = oldFilePath.replace(audioDir, '').replace(/\\/g, '/')
+    const relativeNewPath = newFilePath.replace(audioDir, '').replace(/\\/g, '/')
 
-    try {
-      // Read metadata first to check if new name already exists
-      let metadata: AudioMetadata = {
-        categories: [],
-        files: {}
-      }
+    // Rename the file
+    await rename(oldFilePath, newFilePath)
 
-      try {
-        const content = await readFile(metadataPath, 'utf-8')
-        metadata = JSON.parse(content)
-      } catch {
-        // If metadata file doesn't exist, use default structure
-      }
-
-      // Check if new filename already exists
-      if (metadata.files[newName]) {
-        return NextResponse.json(
-          { error: ERROR_MESSAGES.RENAME.ALREADY_EXISTS },
-          { status: 400 }
-        )
-      }
-
-      // Rename the file
-      await rename(oldPath, newPath)
-
-      // Update metadata
-      if (metadata.files[oldName]) {
-        metadata.files[newName] = metadata.files[oldName]
-        delete metadata.files[oldName]
-        await writeFile(metadataPath, JSON.stringify(metadata, null, 2))
-      }
-
-      return NextResponse.json({
-        success: true,
-        message: 'Fichier renommé avec succès',
-        newPath: `/audio/${newName}`
-      })
-    } catch (error) {
-      console.error('Error renaming file:', error)
-      return NextResponse.json(
-        { error: ERROR_MESSAGES.RENAME.GENERIC },
-        { status: 500 }
-      )
+    // Update metadata
+    const metadata = await readMetadata()
+    const fileInfo = metadata.files[relativeOldPath]
+    delete metadata.files[relativeOldPath]
+    metadata.files[relativeNewPath] = {
+      ...fileInfo,
+      name: sanitizedNewName
     }
+    await writeMetadata(metadata)
+
+    return NextResponse.json({
+      success: true,
+      newPath: `/audio${relativeNewPath}`
+    })
   } catch (error) {
-    console.error('Error processing rename request:', error)
+    console.error('Error renaming file:', error)
     return NextResponse.json(
-      { error: ERROR_MESSAGES.RENAME.GENERIC },
+      { error: 'Erreur lors du renommage du fichier' },
       { status: 500 }
     )
   }

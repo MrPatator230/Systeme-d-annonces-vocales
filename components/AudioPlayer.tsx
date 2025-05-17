@@ -1,64 +1,103 @@
 'use client'
 
-import React from 'react'
-import { HiPlay, HiStop } from 'react-icons/hi2'
-import { useAudio } from '@/contexts/AudioContext'
-import type { AudioFile } from '@/config/audio'
+import React, { useRef, useState } from 'react'
+import { HiPlay, HiPause } from 'react-icons/hi2'
 
 interface AudioPlayerProps {
   src: string
   name: string
-  onPlay?: () => void
-  onStop?: () => void
 }
 
-export default function AudioPlayer({ src, name, onPlay, onStop }: AudioPlayerProps) {
-  const { isPlaying, currentFile, playAudio, stopAudio } = useAudio()
+export default function AudioPlayer({ src, name }: AudioPlayerProps) {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const audioRef = useRef<HTMLAudioElement>(null)
 
-  const isCurrentlyPlaying = isPlaying && currentFile?.path === src
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration)
+    }
+  }
 
-  const handlePlay = () => {
-    if (isCurrentlyPlaying) {
-      stopAudio()
-      onStop?.()
-    } else {
-      const audioFile: AudioFile = {
-        name,
-        path: src,
-        category: 'Non classé',
-        createdAt: new Date().toISOString(),
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime)
+    }
+  }
+
+  const handleEnded = () => {
+    setIsPlaying(false)
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0
+    }
+  }
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
       }
-      playAudio(audioFile)
-      onPlay?.()
+      setIsPlaying(!isPlaying)
+    }
+  }
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = Number(e.target.value)
+    if (audioRef.current) {
+      audioRef.current.currentTime = time
+      setCurrentTime(time)
     }
   }
 
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center space-x-3 flex-1">
       <button
-        onClick={handlePlay}
-        className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-        title={isCurrentlyPlaying ? 'Arrêter' : 'Lire'}
+        onClick={togglePlay}
+        className="p-2 rounded-full hover:bg-gray-200"
+        title={isPlaying ? 'Pause' : 'Play'}
       >
-        {isCurrentlyPlaying ? (
-          <HiStop className="w-5 h-5 text-red-600" />
+        {isPlaying ? (
+          <HiPause className="w-5 h-5" />
         ) : (
-          <HiPlay className="w-5 h-5 text-blue-600" />
+          <HiPlay className="w-5 h-5" />
         )}
       </button>
-      <span className="flex-1 truncate" title={name}>
-        {name}
-      </span>
-      {isCurrentlyPlaying && (
-        <div className="flex items-center space-x-2">
-          <div className="w-16 h-1 bg-blue-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-600 animate-[progress_1s_ease-in-out_infinite]"
-              style={{ width: '100%' }}
-            />
-          </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium truncate" title={name}>
+          {name}
         </div>
-      )}
+        <div className="flex items-center space-x-2">
+          <input
+            type="range"
+            min={0}
+            max={duration || 0}
+            value={currentTime}
+            onChange={handleSeek}
+            className="flex-1 h-1 accent-blue-500"
+          />
+          <span className="text-xs text-gray-500 whitespace-nowrap">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+        </div>
+      </div>
+
+      <audio
+        ref={audioRef}
+        src={src}
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+      />
     </div>
   )
 }

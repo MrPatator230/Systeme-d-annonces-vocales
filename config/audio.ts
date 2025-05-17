@@ -1,17 +1,25 @@
-export type AudioCategory = 'Non classé' | 'Annonces' | 'Stations' | 'Horaires' | 'Messages' | 'Effets sonores'
-
 export interface AudioFile {
   name: string
   path: string
-  category: AudioCategory
+  createdAt: string
+}
+
+export interface Folder {
+  name: string
+  path: string
   createdAt: string
 }
 
 export interface AudioMetadata {
-  categories: AudioCategory[]
+  folders: {
+    [path: string]: {
+      name: string
+      createdAt: string
+    }
+  }
   files: {
-    [key: string]: {
-      category: AudioCategory
+    [path: string]: {
+      name: string
       createdAt: string
     }
   }
@@ -20,15 +28,7 @@ export interface AudioMetadata {
 export const AUDIO_CONFIG = {
   storage: {
     basePath: '/audio',
-    categories: [
-      'Non classé',
-      'Annonces',
-      'Stations',
-      'Horaires',
-      'Messages',
-      'Effets sonores'
-    ] as AudioCategory[],
-    defaultCategory: 'Non classé' as AudioCategory
+    rootFolder: '/audio'
   },
   upload: {
     maxSize: 10 * 1024 * 1024, // 10MB

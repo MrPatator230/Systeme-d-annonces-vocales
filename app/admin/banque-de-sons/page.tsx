@@ -1,21 +1,30 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { uploadAudioFile, getAudioFiles, deleteAudioFile, updateAudioCategory } from '@/services/audioService'
-import AudioPlayer from '@/components/AudioPlayer'
+import { 
+  getAudioFiles, 
+  uploadAudioFile, 
+  deleteAudioFile, 
+  renameAudioFile,
+  createFolder,
+  renameFolder,
+  deleteFolder,
+  moveFolder
+} from '@/services/audioService'
+import { AudioFile, Folder } from '@/config/audio'
 import LoadingSpinner from '@/components/LoadingSpinner'
-import { AUDIO_CONFIG, ERROR_MESSAGES, type AudioFile, type AudioCategory } from '@/config/audio'
-import { validateAudioFile } from '@/utils/audioUtils'
-import { HiOutlinePencil, HiOutlineTrash, HiXMark, HiCheck } from 'react-icons/hi2'
+import FolderTree from '@/components/admin/FileManager/FolderTree'
+import FileList from '@/components/admin/FileManager/FileList'
+import FolderActions from '@/components/admin/FileManager/FolderActions'
+import DragDropZone from '@/components/admin/FileManager/DragDropZone'
 
 export default function BankeDeSonsPage() {
-  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([])
+  const [files, setFiles] = useState<AudioFile[]>([])
+  const [folders, setFolders] = useState<Folder[]>([])
+  const [currentPath, setCurrentPath] = useState('/audio')
   const [isUploading, setIsUploading] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<AudioCategory>(AUDIO_CONFIG.storage.defaultCategory as AudioCategory)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
-  const [editingFile, setEditingFile] = useState<string | null>(null)
-  const [newFileName, setNewFileName] = useState('')
 
   useEffect(() => {
     loadAudioFiles()
@@ -23,15 +32,9 @@ export default function BankeDeSonsPage() {
 
   const loadAudioFiles = async () => {
     try {
-      const files = await getAudioFiles()
-      // Ensure correct typing of categories
-      const typedFiles = files.map(file => ({
-        ...file,
-        category: (AUDIO_CONFIG.storage.categories.includes(file.category as AudioCategory)
-          ? file.category
-          : AUDIO_CONFIG.storage.defaultCategory) as AudioCategory
-      }))
-      setAudioFiles(typedFiles)
+      const { files, folders } = await getAudioFiles()
+      setFiles(files)
+      setFolders(folders)
     } catch (error) {
       console.error('Error loading audio files:', error)
       setError('Erreur lors du chargement des fichiers')
@@ -40,28 +43,19 @@ export default function BankeDeSonsPage() {
     }
   }
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files) return
-
+  const handleFileUpload = async (uploadedFiles: File[]) => {
     setIsUploading(true)
     setError('')
 
     try {
-      for (const file of Array.from(files)) {
-        const validation = await validateAudioFile(file)
-        if (!validation.isValid) {
-          setError(validation.message)
-          continue
-        }
-
-        const result = await uploadAudioFile(file, selectedCategory)
-        if (result.success) {
-          await loadAudioFiles()
-        } else {
+      for (const file of uploadedFiles) {
+        const result = await uploadAudioFile(file, currentPath)
+        if (!result.success) {
           setError(result.message || 'Erreur lors de l\'upload')
+          break
         }
       }
+      await loadAudioFiles()
     } catch (error) {
       console.error('Error uploading files:', error)
       setError('Erreur lors de l\'upload des fichiers')
@@ -70,13 +64,13 @@ export default function BankeDeSonsPage() {
     }
   }
 
-  const handleDeleteFile = async (filename: string) => {
+  const handleDeleteFile = async (path: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
       return
     }
 
     try {
-      const success = await deleteAudioFile(filename)
+      const success = await deleteAudioFile(path)
       if (success) {
         await loadAudioFiles()
       } else {
@@ -88,37 +82,13 @@ export default function BankeDeSonsPage() {
     }
   }
 
-  const handleStartRename = (file: AudioFile) => {
-    setEditingFile(file.name)
-    const nameParts = file.name.split('.')
-    nameParts.pop() // Remove extension
-    setNewFileName(nameParts.join('.'))
-  }
-
-  const handleRename = async () => {
-    if (!editingFile || !newFileName.trim()) return
-
-    const extension = editingFile.split('.').pop() || ''
-    const newFullName = `${newFileName.trim()}.${extension}`
-
+  const handleRenameFile = async (path: string, newName: string) => {
     try {
-      const response = await fetch('/api/audio/rename', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          oldName: editingFile,
-          newName: newFullName,
-        }),
-      })
-
-      if (response.ok) {
+      const result = await renameAudioFile(path, newName)
+      if (result.success) {
         await loadAudioFiles()
-        setEditingFile(null)
-        setNewFileName('')
       } else {
-        setError('Erreur lors du renommage du fichier')
+        setError(result.error || 'Erreur lors du renommage du fichier')
       }
     } catch (error) {
       console.error('Error renaming file:', error)
@@ -126,17 +96,72 @@ export default function BankeDeSonsPage() {
     }
   }
 
-  const handleCategoryChange = async (file: AudioFile, newCategory: AudioCategory) => {
+  const handleCreateFolder = async (name: string) => {
     try {
-      const success = await updateAudioCategory(file.name, newCategory)
-      if (success) {
+      const result = await createFolder(currentPath, name)
+      if (result.success) {
         await loadAudioFiles()
       } else {
-        setError('Erreur lors de la mise à jour de la catégorie')
+        setError(result.error || 'Erreur lors de la création du dossier')
       }
     } catch (error) {
-      console.error('Error updating category:', error)
-      setError('Erreur lors de la mise à jour de la catégorie')
+      console.error('Error creating folder:', error)
+      setError('Erreur lors de la création du dossier')
+    }
+  }
+
+  const handleRenameFolder = async (oldPath: string, newName: string) => {
+    try {
+      const result = await renameFolder(oldPath, newName)
+      if (result.success) {
+        await loadAudioFiles()
+        if (currentPath === oldPath) {
+          setCurrentPath(result.path)
+        }
+      } else {
+        setError(result.error || 'Erreur lors du renommage du dossier')
+      }
+    } catch (error) {
+      console.error('Error renaming folder:', error)
+      setError('Erreur lors du renommage du dossier')
+    }
+  }
+
+  const handleDeleteFolder = async (path: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu ?')) {
+      return
+    }
+
+    try {
+      const result = await deleteFolder(path)
+      if (result.success) {
+        await loadAudioFiles()
+        if (currentPath.startsWith(path)) {
+          setCurrentPath('/audio')
+        }
+      } else {
+        setError(result.error || 'Erreur lors de la suppression du dossier')
+      }
+    } catch (error) {
+      console.error('Error deleting folder:', error)
+      setError('Erreur lors de la suppression du dossier')
+    }
+  }
+
+  const handleMoveFolder = async (sourcePath: string, targetPath: string) => {
+    try {
+      const result = await moveFolder(sourcePath, targetPath)
+      if (result.success) {
+        await loadAudioFiles()
+        if (currentPath.startsWith(sourcePath)) {
+          setCurrentPath(result.path)
+        }
+      } else {
+        setError(result.error || 'Erreur lors du déplacement du dossier')
+      }
+    } catch (error) {
+      console.error('Error moving folder:', error)
+      setError('Erreur lors du déplacement du dossier')
     }
   }
 
@@ -145,7 +170,7 @@ export default function BankeDeSonsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <h1 className="text-2xl font-bold">Banque de sons</h1>
 
       {error && (
@@ -154,127 +179,41 @@ export default function BankeDeSonsPage() {
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Importer des fichiers audio</h2>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value as AudioCategory)}
-            className="p-2 border rounded"
-          >
-            {AUDIO_CONFIG.storage.categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-          <input
-            type="file"
-            accept={AUDIO_CONFIG.upload.allowedTypes}
-            multiple
-            onChange={handleFileUpload}
-            className="hidden"
-            id="audio-upload"
-            disabled={isUploading}
+      <div className="grid grid-cols-4 gap-6">
+        {/* Left sidebar with folder tree */}
+        <div className="col-span-1">
+          <FolderTree
+            folders={folders}
+            currentPath={currentPath}
+            onSelectFolder={setCurrentPath}
+            onMoveFolder={handleMoveFolder}
           />
-          <label
-            htmlFor="audio-upload"
-            className={`
-              cursor-pointer inline-flex items-center px-4 py-2 rounded-lg
-              ${isUploading 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }
-            `}
-          >
-            {isUploading ? 'Upload en cours...' : 'Sélectionner des fichiers audio'}
-          </label>
-          <p className="mt-2 text-sm text-gray-500">
-            Formats acceptés: MP3, WAV • Taille maximum: 10MB
-          </p>
         </div>
-      </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Fichiers audio disponibles</h2>
-        <div className="space-y-2">
-          {audioFiles.map((file) => (
-            <div
-              key={file.path}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded hover:bg-gray-100"
-            >
-              <div className="flex-1">
-                {editingFile === file.name ? (
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={newFileName}
-                      onChange={(e) => setNewFileName(e.target.value)}
-                      className="flex-1 p-1 border rounded"
-                      autoFocus
-                    />
-                    <button
-                      onClick={handleRename}
-                      className="p-2 text-green-600 hover:text-green-700"
-                      title="Sauvegarder"
-                    >
-                      <HiCheck className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => setEditingFile(null)}
-                      className="p-2 text-gray-600 hover:text-gray-700"
-                      title="Annuler"
-                    >
-                      <HiXMark className="w-5 h-5" />
-                    </button>
-                  </div>
-                ) : (
-                  <AudioPlayer
-                    src={file.path}
-                    name={file.name}
-                  />
-                )}
-              </div>
+        {/* Main content area */}
+        <div className="col-span-3 space-y-6">
+          {/* Folder actions */}
+          <FolderActions
+            currentPath={currentPath}
+            onCreateFolder={handleCreateFolder}
+            onRenameFolder={handleRenameFolder}
+            onDeleteFolder={handleDeleteFolder}
+          />
 
-              <div className="flex items-center space-x-4 ml-4">
-                <select
-                  value={file.category}
-                  onChange={(e) => handleCategoryChange(file, e.target.value as AudioCategory)}
-                  className="p-1 text-sm border rounded"
-                >
-                  {AUDIO_CONFIG.storage.categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+          {/* Upload zone */}
+          <DragDropZone
+            currentPath={currentPath}
+            onUpload={handleFileUpload}
+            isUploading={isUploading}
+          />
 
-                <button
-                  onClick={() => handleStartRename(file)}
-                  className="p-2 text-gray-400 hover:text-blue-600"
-                  title="Renommer"
-                >
-                  <HiOutlinePencil className="w-5 h-5" />
-                </button>
-
-                <button
-                  onClick={() => handleDeleteFile(file.name)}
-                  className="p-2 text-gray-400 hover:text-red-600"
-                  title="Supprimer"
-                >
-                  <HiOutlineTrash className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
-          {audioFiles.length === 0 && (
-            <p className="text-gray-500 text-center py-4">
-              Aucun fichier audio disponible
-            </p>
-          )}
+          {/* File list */}
+          <FileList
+            files={files}
+            currentPath={currentPath}
+            onDeleteFile={handleDeleteFile}
+            onRenameFile={handleRenameFile}
+          />
         </div>
       </div>
     </div>
