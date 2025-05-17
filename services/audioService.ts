@@ -186,3 +186,28 @@ export async function moveFolder(sourcePath: string, targetPath: string) {
     }
   }
 }
+
+export async function concatenateAudioFiles(files: string[], outputName: string) {
+  try {
+    const response = await fetch('/api/audio/concatenate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ files, outputName }),
+    })
+
+    const data = await response.json()
+    return {
+      success: response.ok,
+      error: data.error,
+      outputPath: data.outputPath,
+    }
+  } catch (error) {
+    console.error('Error concatenating files:', error)
+    return {
+      success: false,
+      error: 'Erreur lors de la concaténation des fichiers',
+    }
+  }
+}
